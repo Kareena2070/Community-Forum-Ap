@@ -1,0 +1,500 @@
+### Forum API Tester
+### Base URL: http://localhost:3001
+### This file can be used with VS Code REST Client extension
+
+@baseUrl = http://localhost:3001
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5ld3VzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3Njg4OTkxNDUsImV4cCI6MTc2ODkwMjc0NSwic3ViIjoiNiJ9.8rR5GZeRyELEVmt6CeuKltZGavYuGLuUYf1pGVjq_2k
+
+# ============================================
+# AUTHENTICATION ENDPOINTS
+# ============================================
+
+### Register New User
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "password123",
+  "username": "newuser",
+  "bio": "New user bio",
+  "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=new_user",
+  "displayName": "New User",
+  "theme": "light"
+}
+
+### Login User
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "password123"
+}
+
+### Login Jane User
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "password": "password123"
+}
+
+# ============================================
+# USERS ENDPOINTS
+# ============================================
+
+### Get All Users
+GET {{baseUrl}}/users
+
+### Get User by ID
+GET {{baseUrl}}/users/2
+
+### Get User by ID with Embedded Posts
+GET {{baseUrl}}/users/1?_embed=posts
+
+### Update User Profile
+PATCH {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "displayName": "John Updated Doe",
+  "bio": "Updated bio - software developer",
+  "theme": "dark"
+}
+
+### Get Specific User Fields
+GET {{baseUrl}}/users/1?id,username,displayName,avatar
+
+### Get Multiple Users
+GET {{baseUrl}}/users?id=1&id=2&id=3
+
+# ============================================
+# POSTS ENDPOINTS - READ
+# ============================================
+
+### Get All Posts
+GET {{baseUrl}}/posts
+
+### Get Posts with Pagination
+GET {{baseUrl}}/posts?_page=1&_limit=5
+
+### Get Posts Sorted by Date (Newest First)
+GET {{baseUrl}}/posts?_sort=createdAt&_order=desc
+
+### Get Posts Sorted by Likes
+GET {{baseUrl}}/posts?_sort=likes&_order=desc
+
+### Get Posts by Specific Author
+GET {{baseUrl}}/posts?authorId=1
+
+### Get Posts by Multiple Authors
+GET {{baseUrl}}/posts?authorId=1&authorId=2
+
+### Get Posts with Specific Tag
+GET {{baseUrl}}/posts?tags_like=React
+
+### Get Posts with Full-text Search
+GET {{baseUrl}}/posts?q=Redux
+
+### Get Post by ID
+GET {{baseUrl}}/posts/1
+
+### Get Post with Embedded Comments
+GET {{baseUrl}}/posts/1?_embed=comments
+
+### Get Posts by Author with Count
+GET {{baseUrl}}/posts?authorId=1&_expand=author
+
+### Filter Posts by Views (Greater than 100)
+GET {{baseUrl}}/posts?views_gte=100
+
+### Filter Posts by Likes (Less than 20)
+GET {{baseUrl}}/posts?likes_lte=20
+
+### Get Posts Sorted by Views Descending
+GET {{baseUrl}}/posts?_sort=views&_order=desc&_limit=10
+
+# ============================================
+# POSTS ENDPOINTS - CREATE/UPDATE/DELETE
+# ============================================
+
+### Create New Post
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Getting Started with Rust",
+  "content": "Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety. Here's how to get started with Rust:\n\n1. Install Rust using rustup\n2. Set up your development environment\n3. Start with basic syntax\n4. Learn about ownership and borrowing\n\nRust's learning curve is steep, but the benefits are worth it!",
+  "authorId": 1,
+  "tags": ["Rust", "Systems-Programming", "Learning"],
+  "likes": 0,
+  "likedBy": [],
+  "commentCount": 0,
+  "views": 0
+}
+
+### Create Post with Author Object
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Learning git commit",
+  "content": "TypeScript provides powerful features for building scalable applications. Let's explore some advanced patterns that can improve your code quality.\n\nConditional types, mapped types, and generic constraints are powerful tools in your TypeScript arsenal.",
+  "authorId": 2,
+  "author": {
+    "id": 2,
+    "username": "jane_smith",
+    "displayName": "Jane Smith",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=jane_smith"
+  },
+  "tags": ["TypeScript", "Advanced", "Patterns"],
+  "likes": 0,
+  "likedBy": [],
+  "commentCount": 0,
+  "views": 0
+}
+
+### Update Post (Partial)
+PATCH {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Updated: Getting started with React Query",
+  "content": "React Query is a powerful library for managing server state. Updated content here..."
+}
+
+### Update Post Likes Count
+PATCH {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "likes": 25,
+  "likedBy": [2, 3, 4, 5, 1]
+}
+
+### Update Post Comment Count
+PATCH {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "commentCount": 6
+}
+
+### Delete Post
+DELETE {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+
+# ============================================
+# COMMENTS ENDPOINTS - READ
+# ============================================
+
+### Get All Comments
+GET {{baseUrl}}/comments
+
+### Get Comments for Specific Post
+GET {{baseUrl}}/comments?postId=1
+
+### Get Comments with Pagination
+GET {{baseUrl}}/comments?postId=1&_page=1&_limit=5
+
+### Get Comments Sorted by Likes
+GET {{baseUrl}}/comments?postId=1&_sort=likes&_order=desc
+
+### Get Top Comments for Post (Most Liked)
+GET {{baseUrl}}/comments?postId=1&_sort=likes&_order=desc&_limit=3
+
+### Get Comments by Author
+GET {{baseUrl}}/comments?authorId=2
+
+### Get Replies to Comment (Nested Comments)
+GET {{baseUrl}}/comments?parentCommentId=1
+
+### Get Comment by ID
+GET {{baseUrl}}/comments/1
+
+### Get Comment with Replies Embedded
+GET {{baseUrl}}/comments/1?_embed=replies
+
+### Get All Top-level Comments (Not Replies)
+GET {{baseUrl}}/comments?parentCommentId=null
+
+### Get Comments with Author Info
+GET {{baseUrl}}/comments?_expand=author
+
+### Filter Comments by Likes
+GET {{baseUrl}}/comments?postId=1&likes_gte=5
+
+### Get Recent Comments First
+GET {{baseUrl}}/comments?postId=1&_sort=createdAt&_order=desc
+
+# ============================================
+# COMMENTS ENDPOINTS - CREATE/UPDATE/DELETE
+# ============================================
+
+### Create Top-level Comment
+POST {{baseUrl}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "parentCommentId": null,
+  "authorId": 1,
+  "author": {
+    "id": 1,
+    "username": "john_doe",
+    "displayName": "John Doe",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=john_doe"
+  },
+  "content": "This is a great introduction to React Query! I've been using it for months and it's been a game-changer.",
+  "likes": 0,
+  "likedBy": [],
+  "replies": 0
+}
+
+### Create Reply to Comment
+POST {{baseUrl}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "parentCommentId": 1,
+  "authorId": 2,
+  "author": {
+    "id": 2,
+    "username": "jane_smith",
+    "displayName": "Jane Smith",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=jane_smith"
+  },
+  "content": "@john_doe I completely agree! The automatic caching and refetching features have saved us so much development time.",
+  "likes": 0,
+  "likedBy": [],
+  "replies": 0
+}
+
+### Create Nested Reply (Reply to Reply)
+POST {{baseUrl}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "parentCommentId": 2,
+  "authorId": 3,
+  "author": {
+    "id": 3,
+    "username": "alex_developer",
+    "displayName": "Alex Johnson",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=alex_developer"
+  },
+  "content": "@jane_smith Absolutely! Combined with Redux Toolkit for global state, it's a powerful combination.",
+  "likes": 0,
+  "likedBy": [],
+  "replies": 0
+}
+
+### Update Comment
+PATCH {{baseUrl}}/comments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Updated comment text - This is an amazing library!"
+}
+
+### Update Comment Likes
+PATCH {{baseUrl}}/comments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "likes": 9,
+  "likedBy": [1, 3, 4, 5, 2]
+}
+
+### Update Comment Reply Count
+PATCH {{baseUrl}}/comments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "replies": 2
+}
+
+### Delete Comment
+DELETE {{baseUrl}}/comments/1
+Authorization: Bearer {{token}}
+
+# ============================================
+# LIKES ENDPOINTS
+# ============================================
+
+### Get All Likes
+GET {{baseUrl}}/likes
+
+### Get User's All Likes
+GET {{baseUrl}}/likes?userId=1
+
+### Get Likes for Specific Post
+GET {{baseUrl}}/likes?postId=1&type=post
+
+### Get Likes for Specific Comment
+GET {{baseUrl}}/likes?commentId=1&type=comment
+
+### Get Post Likes Count
+GET {{baseUrl}}/likes?postId=1
+
+### Like a Post
+POST {{baseUrl}}/likes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "postId": 2,
+  "type": "post"
+}
+
+### Like a Comment
+POST {{baseUrl}}/likes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "commentId": 3,
+  "type": "comment"
+}
+
+### Unlike a Post (Delete Like)
+DELETE {{baseUrl}}/likes/1
+Authorization: Bearer {{token}}
+
+### Unlike a Comment (Delete Like)
+DELETE {{baseUrl}}/likes/2
+Authorization: Bearer {{token}}
+
+### Get User's Likes on Specific Post
+GET {{baseUrl}}/likes?userId=1&postId=1
+
+# ============================================
+# ADVANCED QUERIES - COMBINATIONS
+# ============================================
+
+### Get Popular Posts (Most Liked, Sorted)
+GET {{baseUrl}}/posts?_sort=likes&_order=desc&_limit=5
+
+### Get Recent Posts with Comments
+GET {{baseUrl}}/posts?_sort=createdAt&_order=desc&_limit=10&_embed=comments
+
+### Get User Profile with Posts
+GET {{baseUrl}}/users/1?_embed=posts
+
+### Get Post with All Comments and Author Info
+GET {{baseUrl}}/posts/1?_embed=comments&_expand=author
+
+### Get Top Comments by Likes for a Post
+GET {{baseUrl}}/comments?postId=1&_sort=likes&_order=desc&_limit=3&_expand=author
+
+### Search Posts and Sort by Relevance
+GET {{baseUrl}}/posts?q=React&_sort=views&_order=desc
+
+### Get Trending Posts (High Views)
+GET {{baseUrl}}/posts?views_gte=200&_sort=createdAt&_order=desc&_limit=5
+
+### Get User Activity (Recent Comments)
+GET {{baseUrl}}/comments?authorId=1&_sort=createdAt&_order=desc&_limit=10
+
+### Get Posts Without Comments Yet
+GET {{baseUrl}}/posts?commentCount=0
+
+### Get Posts with High Engagement
+GET {{baseUrl}}/posts?likes_gte=20&commentCount_gte=3&_sort=likes&_order=desc
+
+# ============================================
+# DATABASE STATS QUERIES
+# ============================================
+
+### Count Total Posts
+GET {{baseUrl}}/posts?_expand=none
+
+### Count Total Comments
+GET {{baseUrl}}/comments
+
+### Count Total Users
+GET {{baseUrl}}/users
+
+### Count Total Likes
+GET {{baseUrl}}/likes
+
+### Get Post with Most Comments
+GET {{baseUrl}}/posts?_sort=commentCount&_order=desc&_limit=1
+
+### Get Most Active User
+GET {{baseUrl}}/users?_sort=createdAt&_order=asc&_limit=1
+
+# ============================================
+# ERROR TESTING
+# ============================================
+
+### Attempt to Get Non-existent Post
+GET {{baseUrl}}/posts/999
+
+### Attempt to Delete Without Token
+DELETE {{baseUrl}}/posts/1
+
+### Attempt to Create Post Without Token
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Test Post",
+  "content": "This should fail",
+  "authorId": 1
+}
+
+### Attempt to Login with Wrong Password
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "wrongpassword"
+}
+
+### Attempt to Register with Existing Email
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "newpassword"
+}
+
+# ============================================
+# BULK OPERATIONS
+# ============================================
+
+### Get Feed (Posts with Comments Count)
+GET {{baseUrl}}/posts?_sort=createdAt&_order=desc&_limit=20&_embed=comments
+
+### Get User Dashboard
+GET {{baseUrl}}/users/1?_embed=posts
+
+### Get Latest 5 Posts with Top 3 Comments Each
+GET {{baseUrl}}/posts?_sort=createdAt&_order=desc&_limit=5&_embed=comments
+
+### Get Comment Thread for Post
+GET {{baseUrl}}/comments?postId=1&_sort=createdAt&_order=asc&_expand=author
+
+### Export User Activity
+GET {{baseUrl}}/comments?authorId=1&_sort=createdAt&_order=desc
